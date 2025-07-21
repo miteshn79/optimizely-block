@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Optimizely Demo Block</title>
+  <style>
+    body { font-family: sans-serif; margin: 32px; }
+    .gallery { display: flex; gap: 15px; }
+    .card { border: 2px solid #eee; padding: 6px; border-radius: 6px; cursor: pointer; }
+    .card.selected { border-color: #1976d2; background: #eaf3ff; }
+    .card img { display: block; width: 140px; height: 80px; object-fit: cover; }
+    .actions { margin-top: 18px; }
+    button { padding: 8px 16px; font-weight: bold; }
+  </style>
+</head>
+<body>
+  <h2>Pick an Optimizely Image</h2>
+  <div class="gallery" id="gallery"></div>
+  <div class="actions">
+    <button id="saveBtn">Save to Email</button>
+  </div>
+  <script src="https://static.cloudflareinsights.com/beacon.min.js"></script>
+  <script src="https://unpkg.com/content-builder-sdk/dist/ContentBlockSDK.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
