@@ -59,10 +59,10 @@
       { url: "https://images.unsplash.com/photo-1465101046530-73398c7f28ca?w=500", label: "Image 2" },
       { url: "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?w=500", label: "Image 3" }
     ];
-
+  
     const gallery = document.getElementById('gallery');
     let selectedIdx = 0;
-
+  
     function renderGallery() {
       gallery.innerHTML = '';
       images.forEach((img, idx) => {
@@ -76,21 +76,30 @@
         gallery.appendChild(card);
       });
     }
-
-    renderGallery();
-
-    document.getElementById('saveBtn').onclick = function() {
-  const img = images[selectedIdx];
-  if (window.ContentBlockSDK && typeof window.ContentBlockSDK.setContent === "function") {
-    window.ContentBlockSDK.setContent(`<img src="${img.url}" alt="${img.label}" style="max-width: 100%;">`);
-    window.ContentBlockSDK.close();
-  } else {
-    alert("You must use this block inside Salesforce Marketing Cloud Content Builder.");
-  }
-};
-
-
-    
+  
+    // Wait for SDK to be injected (asynchronously in SFMC)
+    function waitForSDKAndSetup(cb, retries=0) {
+      if (window.ContentBlockSDK && typeof window.ContentBlockSDK.setContent === "function") {
+        cb();
+      } else if (retries < 30) { // Wait up to ~3 seconds
+        setTimeout(() => waitForSDKAndSetup(cb, retries+1), 100);
+      } else {
+        alert("You must use this block inside Salesforce Marketing Cloud Content Builder.");
+      }
+    }
+  
+    // Run on DOMContentLoaded
+    document.addEventListener("DOMContentLoaded", function() {
+      renderGallery();
+      waitForSDKAndSetup(function() {
+        document.getElementById('saveBtn').onclick = function() {
+          const img = images[selectedIdx];
+          window.ContentBlockSDK.setContent(`<img src="${img.url}" alt="${img.label}" style="max-width: 100%;">`);
+          window.ContentBlockSDK.close();
+        };
+      });
+    });
   </script>
+  
 </body>
 </html>
