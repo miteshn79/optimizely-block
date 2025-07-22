@@ -58,9 +58,10 @@
         const card = document.createElement('div');
         card.className = 'card' + (selectedIdx === idx ? ' selected' : '');
         card.innerHTML = `<img src="${img.url}" /><div>${img.label}</div>`;
+        
         card.onclick = () => {
-          selectedIdx = idx;
-          renderGallery();
+            const img = images[idx];
+            sdk.setContent(`<img src="${img.url}" alt="${img.label}" style="max-width: 100%;">`);
         };
         gallery.appendChild(card);
       });
