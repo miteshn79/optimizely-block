@@ -39,14 +39,19 @@
   <div class="actions">
     <button id="saveBtn">Save to Email</button>
   </div>
+
+  <!-- The official MC Block SDK (downloaded and stored locally) -->
+  <script src="/blocksdk.js"></script>
   <script>
     const images = [
       { url: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=500", label: "Image 1" },
       { url: "https://images.unsplash.com/photo-1465101046530-73398c7f28ca?w=500", label: "Image 2" },
       { url: "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?w=500", label: "Image 3" }
     ];
+
     const gallery = document.getElementById('gallery');
     let selectedIdx = 0;
+
     function renderGallery() {
       gallery.innerHTML = '';
       images.forEach((img, idx) => {
@@ -60,28 +65,17 @@
         gallery.appendChild(card);
       });
     }
+
     renderGallery();
-    // Wait for DOM and SDK, then setup Save button
+
+    // Wait for DOM and then enable Save
     document.addEventListener("DOMContentLoaded", function() {
-      let retries = 0;
-      function trySetupSDK() {
-        // SDK is always attached at window.sfdc.BlockSDK in Content Builder
-        if (window.sfdc && window.sfdc.BlockSDK) {
-          const sdk = new window.sfdc.BlockSDK();
-          document.getElementById('saveBtn').onclick = function() {
-            const img = images[selectedIdx];
-            sdk.setContent(`<img src="${img.url}" alt="${img.label}" style="max-width: 100%;">`);
-          };
-        } else if (retries < 30) {
-          setTimeout(trySetupSDK, 100);
-          retries++;
-        } else {
-          document.getElementById('saveBtn').onclick = function() {
-            alert("SFMC Block SDK not loaded. Make sure to use this block in Content Builder.");
-          }
-        }
-      }
-      trySetupSDK();
+      // Instantiate the official SDK (now always present due to /blocksdk.js)
+      var sdk = new window.sfdc.BlockSDK();
+      document.getElementById('saveBtn').onclick = function() {
+        const img = images[selectedIdx];
+        sdk.setContent(`<img src="${img.url}" alt="${img.label}" style="max-width: 100%;">`);
+      };
     });
   </script>
 </body>
