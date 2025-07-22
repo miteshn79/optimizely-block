@@ -2,25 +2,92 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Optimizely Demo Block</title>
+  <title>Optimizely CMS Gallery Block</title>
   <style>
-    body { font-family: sans-serif; margin: 32px; }
-    .gallery { display: flex; gap: 15px; }
-    .card { border: 2px solid #eee; padding: 6px; border-radius: 6px; cursor: pointer; }
-    .card.selected { border-color: #1976d2; background: #eaf3ff; }
-    .card img { display: block; width: 140px; height: 80px; object-fit: cover; }
-    .actions { margin-top: 18px; }
-    button { padding: 8px 16px; font-weight: bold; }
+    body { font-family: Arial, sans-serif; margin: 20px; background: #f5f7fa; color: #222; }
+    .brand-bar {
+      display: flex;
+      gap: 14px;
+      align-items: center;
+      padding: 16px 0 18px 0;
+      border-bottom: 2px solid #2A5DDE;
+      margin-bottom: 21px;
+    }
+    .logo { height: 36px; }
+    .brand-title { font-size: 1.4em; font-weight: bold; color: #2A5DDE; }
+    .gallery { display: flex; gap: 24px; margin: 18px 0; }
+    .card { border: 2px solid #ddd; border-radius: 6px; cursor: pointer; background: #fff; transition: box-shadow 0.2s, border 0.2s; padding: 7px; }
+    .card.selected, .card:hover { border-color: #2A5DDE; box-shadow: 0 0 9px 0 #2A5DDE44; }
+    .card img { width: 150px; height: 85px; object-fit: cover; border-radius: 3px;}
+    .card div { text-align: center; font-size: 14px; margin-top: 4px; font-weight: 500;}
+    .actions { margin-top: 16px; }
+    #saveBtn {
+      padding: 10px 26px;
+      color: #fff;
+      background: #2A5DDE;
+      border: none;
+      border-radius: 4px;
+      font-size: 1.1em;
+      cursor: pointer;
+      font-weight: bold;
+      box-shadow: 0 2px 6px #2A5DDE22;
+    }
+    #saveBtn:hover { background: #19367a; }
+    @media (max-width: 600px) {
+      .gallery { flex-direction: column; gap: 12px; }
+      .card img { width: 100%; height: 88px;}
+    }
   </style>
 </head>
 <body>
-  <h2>Pick an Optimizely Image</h2>
+  <div class="brand-bar">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/6/6c/Optimizely_logo.svg" alt="Optimizely Logo" class="logo"/>
+    <span class="brand-title">Optimizely CMS Picker</span>
+  </div>
+  <h3>Pick an Optimizely Image</h3>
   <div class="gallery" id="gallery"></div>
   <div class="actions">
     <button id="saveBtn">Save to Email</button>
   </div>
-  <script src="https://static.cloudflareinsights.com/beacon.min.js"></script>
+
+  <!-- SDK via official CDN -->
   <script src="https://unpkg.com/content-builder-sdk/dist/ContentBlockSDK.js"></script>
-  <script src="script.js"></script>
+  <script>
+    // Minimal demo image list, can be swapped for any URLs later
+    const images = [
+      { url: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=500", label: "Image 1" },
+      { url: "https://images.unsplash.com/photo-1465101046530-73398c7f28ca?w=500", label: "Image 2" },
+      { url: "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?w=500", label: "Image 3" }
+    ];
+
+    const gallery = document.getElementById('gallery');
+    let selectedIdx = 0;
+
+    function renderGallery() {
+      gallery.innerHTML = '';
+      images.forEach((img, idx) => {
+        const card = document.createElement('div');
+        card.className = 'card' + (selectedIdx === idx ? ' selected' : '');
+        card.innerHTML = `<img src="${img.url}" /><div>${img.label}</div>`;
+        card.onclick = () => {
+          selectedIdx = idx;
+          renderGallery();
+        };
+        gallery.appendChild(card);
+      });
+    }
+
+    renderGallery();
+
+    document.getElementById('saveBtn').onclick = function() {
+      const img = images[selectedIdx];
+      if (window.ContentBlockSDK && typeof ContentBlockSDK.setContent === "function") {
+        ContentBlockSDK.setContent(`<img src="${img.url}" alt="${img.label}" style="max-width: 100%;">`);
+        ContentBlockSDK.close();
+      } else {
+        alert("Content Block SDK missing or not loaded.");
+      }
+    };
+  </script>
 </body>
 </html>

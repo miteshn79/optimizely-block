@@ -25,8 +25,13 @@ const images = [
   
   document.getElementById('saveBtn').onclick = function() {
     const img = images[selectedIdx];
-    // push HTML to Content Builder
-    ContentBlockSDK.setContent(`<img src="${img.url}" alt="${img.label}" style="max-width: 100%;">`);
-    ContentBlockSDK.close();
+    // Defensive: check ContentBlockSDK exists
+    if (window.ContentBlockSDK && typeof window.ContentBlockSDK.setContent === 'function') {
+      ContentBlockSDK.setContent(`<img src="${img.url}" alt="${img.label}" style="max-width: 100%;">`);
+      ContentBlockSDK.close();
+    } else {
+      alert("Content Block SDK missing or not loaded.");
+    }
   };
+  
   
