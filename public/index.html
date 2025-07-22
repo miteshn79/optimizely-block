@@ -51,7 +51,7 @@
   </div>
 
   <!-- SDK via official CDN -->
-  <script src="https://unpkg.com/content-builder-sdk/dist/ContentBlockSDK.js"></script>
+  
   <script>
     // Minimal demo image list, can be swapped for any URLs later
     const images = [
@@ -80,14 +80,17 @@
     renderGallery();
 
     document.getElementById('saveBtn').onclick = function() {
-      const img = images[selectedIdx];
-      if (window.ContentBlockSDK && typeof ContentBlockSDK.setContent === "function") {
-        ContentBlockSDK.setContent(`<img src="${img.url}" alt="${img.label}" style="max-width: 100%;">`);
-        ContentBlockSDK.close();
-      } else {
-        alert("Content Block SDK missing or not loaded.");
-      }
-    };
+  const img = images[selectedIdx];
+  if (window.ContentBlockSDK && typeof window.ContentBlockSDK.setContent === "function") {
+    window.ContentBlockSDK.setContent(`<img src="${img.url}" alt="${img.label}" style="max-width: 100%;">`);
+    window.ContentBlockSDK.close();
+  } else {
+    alert("You must use this block inside Salesforce Marketing Cloud Content Builder.");
+  }
+};
+
+
+    
   </script>
 </body>
 </html>
