@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Optimizely Demo: Upload/Link an Image</title>
+  <style>
+    body {
+      background: #f7fafd;
+      font-family: 'Segoe UI', Arial, sans-serif;
+      color: #26334a;
+      margin: 32px;
+    }
+    .header {
+      background: #2A5DDE;
+      color: #fff;
+      padding: 18px 24px;
+      border-radius: 9px 9px 0 0;
+      margin-bottom: 0;
+      font-weight: bold;
+      font-size: 1.4em;
+      letter-spacing: 0.05em;
+    }
+    .subtitle {
+      font-size: 1.1em;
+      color: #3a4a6d;
+      margin: 0 0 22px 0;
+    }
+    .card {
+      background: #fff;
+      padding: 26px;
+      border-radius: 0 0 9px 9px;
+      box-shadow: 0 3px 15px 0 #2a5dde22;
+      max-width: 480px;
+      margin-top: 0;
+    }
+    .field-group { margin-bottom: 18px; }
+    label { font-weight: 500; }
+    input[type="file"], input[type="text"], button {
+      padding: 7px 10px;
+      font-size: 1em;
+      border-radius: 4px;
+      border: 1px solid #c9d7ef;
+    }
+    input[type="file"] { background: #fff; }
+    button {
+      background: #2A5DDE;
+      color: #fff;
+      border: none;
+      font-weight: bold;
+      cursor: pointer;
+      margin-top: 14px;
+      min-width: 120px;
+    }
+    button:hover { background: #1a3977; }
+    .note { color: #5371b7; font-size: 0.96em; margin-top: 7px; }
+    .success { color: #29913b;margin-top:12px;}
+    .error { color: #c73034;margin-top:12px;}
+    .img-preview { margin-top: 10px; max-width: 200px; border-radius: 7px; }
+  </style>
+</head>
+<body>
+  <div class="header">
+    Optimizely → Marketing Cloud Demo: Simulate New Image Upload
+  </div>
+  <div class="card">
+    <div class="subtitle">
+      Upload a new image (simulating Optimizely CMS), or provide a public image URL.<br>
+      <span class="note">Images uploaded here will appear immediately in your Marketing Cloud block gallery (on refresh).</span>
+    </div>
+    <form id="uploadForm" enctype="multipart/form-data">
+      <div class="field-group">
+        <label for="fileInput">Upload from desktop:</label><br>
+        <input type="file" id="fileInput" name="image" accept="image/*" />
+      </div>
+      <div class="field-group">
+        <label for="urlInput">Or add a public image URL:</label><br>
+        <input type="text" id="urlInput" name="imageUrl" placeholder="https://your-cdn.com/image.jpg" style="width: 98%;" />
+      </div>
+      <button type="submit">Add Image</button>
+    </form>
+    <div id="result"></div>
+    <div id="preview"></div>
+  </div>
+  <script>
+    const form = document.getElementById('uploadForm');
+    const result = document.getElementById('result');
+    const preview = document.getElementById('preview');
+
+    form.onsubmit = async function(e) {
+      e.preventDefault();
+      result.textContent = '';
+      preview.innerHTML = '';
+
+      const file = document.getElementById('fileInput').files[0];
+      const url = document.getElementById('urlInput').value.trim();
+
+      // Choose upload method
+      if (file) {
+        const formData = new FormData();
+        formData.append('image', file);
+        const res = await fetch('/upload-image-demo', {
+          method: 'POST',
+          body: formData
+        });
+        const json = await res.json();
+        if (res.ok) {
+          result.innerHTML = `<span class="success">Image uploaded successfully!</span>`;
+          preview.innerHTML = `<img src="${json.url}" class="img-preview" />`;
+        } else {
+          result.innerHTML = `<span class="error">Error: ${json.error || 'Failed to upload'}</span>`;
+        }
+      } else if (url) {
+        const res = await fetch('/add-image-url-demo', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({ imageUrl: url })
+        });
+        const json = await res.json();
+        if (res.ok) {
+          result.innerHTML = `<span class="success">Image URL added!</span>`;
+          preview.innerHTML = `<img src="${url}" class="img-preview" />`;
+        } else {
+          result.innerHTML = `<span class="error">Error: ${json.error || 'Failed to add URL'}</span>`;
+        }
+      } else {
+        result.innerHTML = `<span class="error">Please select a file or enter an image URL.</span>`;
+      }
+    }
+  </script>
+</body>
+</html>
